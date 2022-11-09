@@ -17,6 +17,7 @@ namespace EX4
             myConnection = new OleDbConnection(connectionString);
         }
 
+
         public bool addKind(string KindName)
         {
             OleDbCommand myCommand = new OleDbCommand("AddKind", myConnection);
@@ -104,9 +105,32 @@ namespace EX4
             DataSet dataSet = new DataSet();
             try
             {
-                adapter.Fill(dataSet, "KindsTlb");
-                dataSet.Tables["KindsTlb"].PrimaryKey = new DataColumn[]{
-                    dataSet.Tables["KindsTlb"].Columns["KodItem"] 
+                adapter.Fill(dataSet, "KindsTbl");
+                dataSet.Tables["KindsTbl"].PrimaryKey = new DataColumn[]{
+                    dataSet.Tables["KindsTbl"].Columns["KodItem"] 
+                };
+
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+
+            }
+            return dataSet;
+        }
+        public DataSet GetWords()
+        {
+            OleDbCommand myCommand = new OleDbCommand("GetAllWords", myConnection);
+            myCommand.CommandType = System.Data.CommandType.StoredProcedure;
+            OleDbDataAdapter adapter = new OleDbDataAdapter();
+            adapter.SelectCommand = myCommand;
+            DataSet dataSet = new DataSet();
+            try
+            {
+                adapter.Fill(dataSet, "WordsTbl");
+                dataSet.Tables["WordsTbl"].PrimaryKey = new DataColumn[]{
+                    dataSet.Tables["WordsTbl"].Columns["Kod"]
                 };
 
 
@@ -119,18 +143,43 @@ namespace EX4
             return dataSet;
         }
 
-        private void CreateRelation(DataSet DS)
+        public void CreateRelation(DataSet DS)
         {
             // Get the DataColumn objects from two DataTable objects in a DataSet.
             DataColumn parentCol;
             DataColumn childCol;
-            parentCol = DS.Tables["KindsTIb"].Columns["KodItem"];
-            childCol = DS.Tables["WordsT1b"].Columns["KodItem"];
+            parentCol = DS.Tables["KindsTbl"].Columns["KodItem"];
+            childCol = DS.Tables["WordsTbl"].Columns["KodItem"];
             
             DataRelation relKindWord;
             relKindWord = new DataRelation("KindWord", parentCol, childCol);
             // Add the relation to the DataSet.
             DS.Relations.Add(relKindWord);
+        }
+        public DataSet GetSubjectsAndWords()
+        {
+            DataSet dataSet = new DataSet();
+            OleDbDataAdapter adapterWords = new OleDbDataAdapter();
+            OleDbDataAdapter adapterKinds = new OleDbDataAdapter();
+            OleDbCommand cmdWords = new OleDbCommand("GetAllWords", myConnection);
+            cmdWords.CommandType = CommandType.StoredProcedure;
+            adapterWords.SelectCommand = cmdWords;
+            OleDbCommand cmdKinds = new OleDbCommand("GetAllKinds", myConnection);
+            cmdKinds.CommandType = CommandType.StoredProcedure;
+            adapterWords.SelectCommand = cmdWords;
+            adapterKinds.SelectCommand = cmdKinds;
+            try
+            {
+                adapterKinds.Fill(dataSet, "KindsTbl");
+                adapterWords.Fill(dataSet, "WordsTbl");
+                dataSet.Tables["KindsTbl"].PrimaryKey = new DataColumn[]
+                { dataSet.Tables["KindsTbl"].Columns["KodItem"] };
+                dataSet.Tables["WordsTbl"].PrimaryKey = new DataColumn[]
+                {dataSet.Tables["WordsTbl"].Columns["Kod"]};
+                CreateRelation(dataSet);
+            }
+            catch (Exception ex) { throw ex; }
+            return dataSet;
         }
     }
 }

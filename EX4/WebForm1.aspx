@@ -9,14 +9,12 @@
 <body>
     <form id="form1" runat="server">
         <div>
-            <p>
-                <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
-        </p>
             <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Refresh" />
-            <asp:GridView ID="GridView1" runat="server" OnSelectedIndexChanged="GridView1_SelectedIndexChanged">
-            </asp:GridView>
+            <asp:GridView ID="GridView1" runat="server" >
+                </asp:GridView>
+            <br />
             <asp:GridView ID="GridView2" runat="server">
-            </asp:GridView>
+                </asp:GridView>
         </div>
         <asp:Label ID="LabelMsg" runat="server" Text=""></asp:Label>
         <br />
